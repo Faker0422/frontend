@@ -1,0 +1,370 @@
+import { Component, Input } from '@angular/core';
+import { OrderItem } from '../../models/order';
+@Component({
+  selector: 'app-order-item',
+  standalone: false,
+  templateUrl: './order-item.component.html',
+  styleUrl: './order-item.component.css'
+})
+export class OrderItemComponent {
+  @Input() item!: OrderItem;
+  @Input() orderStatus!:string;
+  @Input() deliveryDate!: string;
+
+  getStatusColor(): string {
+    switch (this.orderStatus.toLowerCase()) {
+      case 'delivered':
+        return 'green';
+      case 'cancelled':
+        return 'red';
+      default:
+        return 'blue';
+    }
+  }
+}
+
+<div class="order-item">
+    <img [src]="'https://m.media-amazon.com/images/I/711fYUFXhcL._SL1500_.jpg'" alt="{{ item.productName }}" class="product-image">
+    
+    <div class="item-details">
+      <h3>{{ item.productName }}</h3>
+      <p>Qty: {{ item.quantity }}</p>
+      <p class="price">Price: ${{ item.productPrice }}</p>
+    </div>
+    <div class="status">
+      <p>Status</p>
+      <p [ngStyle]="{ 'color': getStatusColor() }">{{ orderStatus }}</p>
+    </div>
+    <div class="delivery">
+      <p>Delivery Date</p>
+      <p><strong>{{ deliveryDate }}</strong></p>
+    </div>
+  </div>
+import { Component, OnInit } from '@angular/core';
+import { OrderService } from '../../services/order.service';
+import { Order } from '../../models/order';
+
+@Component({
+  selector: 'app-order-list',
+  standalone: false,
+  templateUrl: './order-list.component.html',
+  styleUrl: './order-list.component.css'
+})
+export class OrderListComponent implements OnInit {
+  orders: Order[] = [];
+  filteredOrders: Order[] = [];
+  selectedFilter: string = 'all';
+  isEmptyOrders: boolean = false; // Flag for overall empty orders
+  isEmptyInProgressOrders: boolean = false;
+  isEmptyDeliveredOrders: boolean = false;
+  isEmptyCancelledOrders: boolean = false;
+
+  constructor(private orderService: OrderService) {}
+
+  ngOnInit(): void {
+    this.orderService.getOrders().subscribe(data => {
+      this.orders = data;
+      this.fetchOrders(); // Initialize filteredOrders with all orders
+    });
+  }
+
+  fetchOrders(): void {
+    this.orderService.getOrders().subscribe({ // Use observer argument
+        next: (orders: Order[]) => { // next callback
+            this.orders = orders;
+            console.log('Fetched Orders:', this.orders);
+            this.applyFilter();
+        },
+        error: (error) => { // error callback
+            console.error('Error fetching orders:', error);
+        }
+        // You can add a 'complete' callback here if you need to handleObservable completion
+        // complete: () => { console.log('Observable completed'); }
+    });
+}
+
+setFilter(filterType: string): void {
+  console.log('Filter set to:', filterType); // Log when filter is set
+  this.selectedFilter = filterType;
+  this.applyFilter();
+}
+
+applyFilter(): void {
+    if (this.selectedFilter === 'all') {
+        this.filteredOrders = [...this.orders]; // Show all orders
+    } else if (this.selectedFilter === 'inProgress') {
+        // Define what "summary" filter means for your orders, adapt logic as needed
+        this.filteredOrders = this.orders.filter(order => order.orderStatus === 'PENDING'); // Example - adjust status as needed
+    } else if (this.selectedFilter === 'Delivered') {
+        this.filteredOrders = this.orders.filter(order => order.orderStatus === 'DELIVERED');
+    } else if (this.selectedFilter === 'Cancelled') {
+        this.filteredOrders = this.orders.filter(order => order.orderStatus === 'CANCELLED');
+    } else {
+        this.filteredOrders = [...this.orders]; // Default to showing all if filter is unknown
+    }
+    console.log('Filtered Orders:', this.filteredOrders);
+    this.updateEmptyStateFlags();
+}
+updateEmptyStateFlags(): void {
+  this.isEmptyOrders = this.orders.length === 0;
+  this.isEmptyInProgressOrders = this.selectedFilter === 'inProgress' && this.filteredOrders.length === 0;
+  this.isEmptyDeliveredOrders = this.selectedFilter === 'Delivered' && this.filteredOrders.length === 0;
+  this.isEmptyCancelledOrders = this.selectedFilter === 'Cancelled' && this.filteredOrders.length === 0;
+}
+
+isAnyFilterEmpty(): boolean {
+  return this.isEmptyOrders || this.isEmptyInProgressOrders || this.isEmptyDeliveredOrders || this.isEmptyCancelledOrders;
+}
+
+getEmptyStateMessage(): string {
+  if (this.isEmptyOrders) {
+      return "You haven't placed any orders yet.";
+  } else if (this.isEmptyInProgressOrders) {
+      return "No orders in progress.";
+  } else if (this.isEmptyDeliveredOrders) {
+      return "No delivered orders found.";
+  } else if (this.isEmptyCancelledOrders) {
+      return "No cancelled orders found.";
+  }
+  return ""; // Should not reach here in normal cases, but for type safety
+}
+
+getEmptyStateIcon(): string {
+  if (this.isEmptyOrders) {
+      return "bi-box-seam"; // Bootstrap Icon name for empty box
+  } else if (this.isEmptyInProgressOrders || this.isEmptyDeliveredOrders || this.isEmptyCancelledOrders) {
+      return "bi-search-x"; // Bootstrap Icon name for search with x (no results)
+  }
+  return ""; // Default, should not be used if isAnyFilterEmpty is checked first
+}
+}
+<div class="order-history-container">
+    <h2>Order History</h2>
+    <div class="filters">
+        <button
+            class="filter-item"
+            [class.active]="selectedFilter === 'all'"
+            (click)="setFilter('all')"
+        >All Order</button>
+        <button
+            class="filter-item"
+            [class.active]="selectedFilter === 'inProgress'"
+            (click)="setFilter('inProgress')"
+        >In Progress</button>
+        <button
+            class="filter-item"
+            [class.active]="selectedFilter === 'Delivered'"
+            (click)="setFilter('Delivered')"
+        >Delivered</button>
+        <button
+            class="filter-item"
+            [class.active]="selectedFilter === 'Cancelled'"
+            (click)="setFilter('Cancelled')"
+        >Cancelled</button>
+    </div>
+    <div *ngIf="!isAnyFilterEmpty(); else emptyStateTemplate">
+    <div *ngFor="let order of filteredOrders" class="order-card">
+      <div class="order-header">
+        <p><strong>Order: #{{ order.orderId }}</strong></p>
+        <p>Order Date: {{ order.createdAt | date:'yyyy-MM-dd' }}</p>
+        <button class="btn-buy">View Order</button>
+      </div>
+      
+      <div *ngFor="let item of order.orderItems">
+        <app-order-item [item]="item" [orderStatus]="order.orderStatus" [deliveryDate]="order.deliveryDate"></app-order-item>
+      </div>
+  
+      <p class="total-amount">Total: ${{ order.totalAmount }}</p>
+    </div>
+  </div>
+  <ng-template #emptyStateTemplate>
+    <div class="empty-order-state">
+        <i class="bi" [class]="getEmptyStateIcon()" style="font-size: 3rem;"></i> <br> <br>
+        <p class="empty-order-message">{{ getEmptyStateMessage() }}</p>
+        <p class="empty-order-message">You can browse our products and place an order.</p>
+        </div>
+</ng-template>
+</div>
+
+export interface Order {
+    orderId: number;
+    userId: number;
+    totalAmount: number;
+    orderStatus: string;
+    deliveryAddress: Address; // Full address object
+    deliveryDate: string;
+    createdAt: string;
+    orderItems: OrderItem[];
+  }
+  
+  export interface Address {
+    addressId: number;
+    street: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  }
+  
+  export interface OrderItem {
+    orderItemId: number;
+    productId: number;
+    productName: string;
+    quantity: number;
+    productPrice: number;
+    discount: number;
+    createdAt: string;
+    image: string;
+  }
+  import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { Order } from '../models/order';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class OrderService {
+  private apiUrl = 'http://localhost:8766/api/order/history/3'; // Replace with your backend API URL
+
+  constructor(private http: HttpClient) { }
+
+  getOrders(): Observable<Order[]> {
+    return this.http.get<Order[]>(this.apiUrl);
+  }
+}
+package com.genckart.dto;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.sql.Timestamp;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class OrderHistoryDTO {
+    private Integer orderHistoryId;
+    private Integer orderId;
+    private Integer userId;
+    private String orderStatus;
+}
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class OrderServiceImpl implements OrderService {
+
+    private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final OrderHistoryRepository orderHistoryRepository;
+    private final UserClient userClient;
+    private final ProductClient productClient;
+    private final CartClient cartClient;
+
+    public OrderDTO getOrderDetails(Integer orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("Order not found with ID: " + orderId));
+
+        List<OrderItem> orderItems = orderItemRepository.findByOrderId(orderId);
+        List<OrderHistory> orderHistory = orderHistoryRepository.findByOrderId(orderId);
+
+        OrderDTO orderDTO = convertToDTO(order);
+        orderDTO.setOrderItems(orderItems.stream()
+                .map(this::convertToOrderItemDTO)
+                .collect(Collectors.toList()));
+        orderDTO.setOrderHistory(orderHistory.stream()
+                .map(this::convertToOrderHistoryDTO)
+                .collect(Collectors.toList()));
+
+        return orderDTO;
+    }
+
+    public List<OrderDTO> getOrderHistory(Integer userId) {
+        List<Order> orders = orderRepository.findByUserId(userId);
+        if (orders.isEmpty()) {
+            throw new OrderNotFoundException("No orders found for user ID: " + userId);
+        }
+        return orders.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteOrder(Integer orderId) {
+        if (!orderRepository.existsById(orderId)) {
+            throw new OrderNotFoundException("Order not found with ID: " + orderId);
+        }
+        orderItemRepository.deleteByOrder_OrderId(orderId);
+        orderHistoryRepository.deleteByOrder_OrderId(orderId);
+        orderRepository.deleteById(orderId);
+    }
+
+    private OrderDTO convertToDTO(Order order) {
+        OrderDTO orderDTO = new OrderDTO();
+        orderDTO.setOrderId(order.getOrderId());
+        orderDTO.setUserId(order.getUserId());
+        orderDTO.setTotalAmount(order.getTotalAmount());
+        orderDTO.setOrderStatus(order.getOrderStatus());
+        orderDTO.setDeliveryAddressId(order.getDeliveryAddressId());
+        ResponseEntity<AddressDTO> addressResponse = userClient.getAddressById(orderDTO.getUserId());
+        AddressDTO userAddress=addressResponse.getBody();
+        orderDTO.setDeliveryAddress(userAddress);
+        orderDTO.setDeliveryDate(order.getDeliveryDate());
+        orderDTO.setCreatedAt(order.getCreatedAt());
+
+        orderDTO.setOrderItems(orderItemRepository.findByOrderId(order.getOrderId())
+                .stream().map(this::convertToOrderItemDTO).collect(Collectors.toList()));
+
+        orderDTO.setOrderHistory(orderHistoryRepository.findByOrderId(order.getOrderId())
+                .stream().map(this::convertToOrderHistoryDTO).collect(Collectors.toList()));
+
+        return orderDTO;
+    }
+
+    private OrderItemDTO convertToOrderItemDTO(OrderItem orderItem) {
+        OrderItemDTO orderItemDTO = new OrderItemDTO();
+        orderItemDTO.setOrderItemId(orderItem.getOrderItemId());
+        orderItemDTO.setProductId(orderItem.getProductId());
+        orderItemDTO.setQuantity(orderItem.getQuantity());
+        orderItemDTO.setProductPrice(orderItem.getProductPrice());
+        orderItemDTO.setTotalPrice(orderItem.getTotalPrice());
+        orderItemDTO.setCreatedAt(orderItem.getCreatedAt());
+
+        // Fetch product details from Product Service to get productName, discount, image, shipping fee
+        ResponseEntity<ProductDTO> productResponse = productClient.getProductById(orderItem.getProductId());
+        if (productResponse.hasBody()) {
+            ProductDTO product = productResponse.getBody();
+            orderItemDTO.setProductName(product.getName());
+            orderItemDTO.setDiscount(product.getDiscount());
+            orderItemDTO.setImage(product.getImage1());
+            orderItemDTO.setHighlightShippingFee(product.getHighlightShippingFee());
+        } else {
+            orderItemDTO.setProductName("Unknown Product");
+            orderItemDTO.setDiscount(0.0);
+            orderItemDTO.setImage(null);
+            orderItemDTO.setHighlightShippingFee(0.0);
+        }
+        return orderItemDTO;
+    }
+
+    private OrderHistoryDTO convertToOrderHistoryDTO(OrderHistory orderHistory) {
+        OrderHistoryDTO orderHistoryDTO = new OrderHistoryDTO();
+        orderHistoryDTO.setOrderHistoryId(orderHistory.getOrderHistoryId());
+        orderHistoryDTO.setOrderId(orderHistory.getOrder().getOrderId());
+        orderHistoryDTO.setUserId(orderHistory.getUserId());
+        orderHistoryDTO.setOrderStatus(orderHistory.getOrderStatus());
+        return orderHistoryDTO;
+    }
+}
+  
+
+
+
+
+
+
+
+
+
+
+
