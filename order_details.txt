@@ -160,6 +160,55 @@ mponent OrderDetailsComponent.
 
 
 
+<div class="order-details-container">
+  <h2>Order Details</h2>
+  <div class="order-info">
+    <p><strong>Order ID:</strong> {{ order.orderId }}</p>
+    <p><strong>Order Date:</strong> {{ order.createdAt | date: 'yyyy-MM-dd' }}</p>
+  </div>
+  <div class="shipping-address">
+    <h3>Shipping Address</h3>
+    <p>
+      {{ order.deliveryAddress.street }}, {{ order.deliveryAddress.city }},
+      {{ order.deliveryAddress.state }}, {{ order.deliveryAddress.postalCode }},
+      {{ order.deliveryAddress.country }}
+    </p>
+  </div>
+  <div class="billing-details">
+    <h3>Billing Details</h3>
+    <div *ngFor="let item of order.orderItems" class="order-item">
+      <div class="product-image">
+        <img [src]="item.image" alt="{{ item.productName }}" />
+      </div>
+      <div class="item-details">
+        <p><strong>Product Name:</strong> {{ item.productName }}</p>
+        <p><strong>Order Item Number:</strong> {{ item.orderItemId }}</p>
+        <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+        <p><strong>Price:</strong> ${{ item.productPrice }}</p>
+        <p><strong>Discount:</strong> ${{ item.discount }}</p>
+        <p><strong>Shipping Fee:</strong> ${{ item.highlightShippingFee }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="status-bar">
+    <app-order-status [orderStatus]="order.orderStatus"></app-order-status>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // order.service.ts
 import { Injectable } from '@angular/core';
