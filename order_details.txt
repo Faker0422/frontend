@@ -1,3 +1,38 @@
+  Error occurs in the template of component OrderStatusComponent.       
+
+    src/app/components/order-status/order-status.component.ts:6:15:     
+      6 │   templateUrl: './order-status.component.html',
+        ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+X [ERROR] NG9: Property 'orderStatus' does not exist on type 'OrderStatusComponent'. [plugin angular-compiler]
+
+    src/app/components/order-status/order-status.component.html:11:96:  
+      11 │ ...tatus === 'delivered', 'cancelled': orderStatus === 'cancelled'}">
+         ╵                          
+              ~~~~~~~~~~~
+
+  Error occurs in the template of component OrderStatusComponent.       
+
+    src/app/components/order-status/order-status.component.ts:6:15:     
+      6 │   templateUrl: './order-status.component.html',
+        ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Watch mode enabled. Watching for file changes...
+
+
+
+
+
+
+
+
+
+
+
+
+
 // order.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
