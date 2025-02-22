@@ -1,3 +1,287 @@
+// order.service.ts
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { Order } from '../models/order';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class OrderService {
+  private baseUrl = 'http://localhost:8766/api/order'; // Base URL for order endpoints
+
+  constructor(private http: HttpClient) {}
+
+  // Fetch order history for a specific user
+  getOrders(): Observable<Order[]> {
+    return this.http.get<Order[]>(`${this.baseUrl}/history/1`);
+  }
+
+  // Fetch order details by orderId
+  getOrderDetails(orderId: number): Observable<Order> {
+    return this.http.get<Order>(`${this.baseUrl}/${orderId}`);
+  }
+}
+
+
+
+
+// app-routing.module.ts
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { OrderListComponent } from './components/order-list/order-list.component';
+import { OrderDetailsComponent } from './components/order-details/order-details.component';
+
+const routes: Routes = [
+  { path: 'orders', component: OrderListComponent },
+  { path: 'orders/:id', component: OrderDetailsComponent }, // Route for order details
+  { path: '', redirectTo: '/orders', pathMatch: 'full' }, // Default route
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule],
+})
+export class AppRoutingModule {}
+
+
+
+
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { OrderService } from '../../services/order.service';
+import { Order } from '../../models/order';
+
+@Component({
+  selector: 'app-order-details',
+  templateUrl: './order-details.component.html',
+  styleUrls: ['./order-details.component.css'],
+})
+export class OrderDetailsComponent implements OnInit {
+  order!: Order;
+
+  constructor(
+    private route: ActivatedRoute,
+    private orderService: OrderService
+  ) {}
+
+  ngOnInit(): void {
+    const orderId = this.route.snapshot.paramMap.get('id');
+    if (orderId) {
+      this.orderService.getOrderDetails(+orderId).subscribe((data) => {
+        this.order = data;
+      });
+    }
+  }
+}
+
+
+
+
+
+
+<div class="order-details-container">
+  <h2>Order Details</h2>
+  <div class="order-info">
+    <p><strong>Order ID:</strong> {{ order.orderId }}</p>
+    <p><strong>Order Date:</strong> {{ order.createdAt | date: 'yyyy-MM-dd' }}</p>
+  </div>
+  <div class="shipping-address">
+    <h3>Shipping Address</h3>
+    <p>
+      {{ order.deliveryAddress.street }}, {{ order.deliveryAddress.city }},
+      {{ order.deliveryAddress.state }}, {{ order.deliveryAddress.postalCode }},
+      {{ order.deliveryAddress.country }}
+    </p>
+  </div>
+  <div class="billing-details">
+    <h3>Billing Details</h3>
+    <div *ngFor="let item of order.orderItems">
+      <p><strong>Product:</strong> {{ item.productName }}</p>
+      <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+      <p><strong>Price:</strong> ${{ item.productPrice }}</p>
+      <p><strong>Discount:</strong> ${{ item.discount }}</p>
+      <p><strong>Shipping Fee:</strong> ${{ item.highlightShippingFee }}</p>
+    </div>
+  </div>
+  <div class="status-bar">
+    <app-order-status [orderStatus]="order.orderStatus"></app-order-status>
+  </div>
+</div>
+
+
+
+
+
+
+.order-details-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.order-info,
+.shipping-address,
+.billing-details {
+  margin-bottom: 20px;
+}
+
+h2,
+h3 {
+  color: #333;
+}
+
+p {
+  margin: 5px 0;
+}
+
+.status-bar {
+  margin-top: 20px;
+}
+
+
+
+<!-- order-status.component.html -->
+<div class="status-bar">
+  <div class="status-step" [ngClass]="{'completed': orderStatus === 'ordered' || orderStatus === 'shipped' || orderStatus === 'delivered', 'cancelled': orderStatus === 'cancelled'}">
+    <span class="status-icon">&#10003;</span>
+    <span class="status-text">Ordered</span>
+  </div>
+  <div class="status-step" [ngClass]="{'completed': orderStatus === 'shipped' || orderStatus === 'delivered', 'cancelled': orderStatus === 'cancelled'}">
+    <span class="status-icon">&#10003;</span>
+    <span class="status-text">Shipped</span>
+  </div>
+  <div class="status-step" [ngClass]="{'completed': orderStatus === 'delivered', 'cancelled': orderStatus === 'cancelled'}">
+    <span class="status-icon">&#10003;</span>
+    <span class="status-text">Delivered</span>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- order-list.component.html -->
+<div class="order-history-container">
+  <h2>Order History</h2>
+  <div class="filters">
+    <!-- Filters here -->
+  </div>
+  <div *ngIf="!isAnyFilterEmpty(); else emptyStateTemplate">
+    <div *ngFor="let order of filteredOrders" class="order-card">
+      <div class="order-header">
+        <p><strong>Order: #{{ order.orderId }}</strong></p>
+        <p>Order Date: {{ order.createdAt | date: 'yyyy-MM-dd' }}</p>
+        <button class="btn-buy" [routerLink]="['/orders', order.orderId]">View Order</button>
+      </div>
+      <div *ngFor="let item of order.orderItems">
+        <app-order-item
+          [item]="item"
+          [orderStatus]="order.orderStatus"
+          [deliveryDate]="order.deliveryDate"
+        ></app-order-item>
+      </div>
+      <p class="total-amount">Total: ${{ order.totalAmount }}</p>
+    </div>
+  </div>
+  <ng-template #emptyStateTemplate>
+    <!-- Empty state template -->
+  </ng-template>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+// order-list.component.ts
+import { Component, OnInit } from '@angular/core';
+import { OrderService } from '../../services/order.service';
+import { Order } from '../../models/order';
+
+@Component({
+  selector: 'app-order-list',
+  templateUrl: './order-list.component.html',
+  styleUrls: ['./order-list.component.css'],
+})
+export class OrderListComponent implements OnInit {
+  orders: Order[] = [];
+  filteredOrders: Order[] = [];
+  selectedFilter: string = 'all';
+  isEmptyOrders: boolean = false;
+  isEmptyInProgressOrders: boolean = false;
+  isEmptyDeliveredOrders: boolean = false;
+  isEmptyCancelledOrders: boolean = false;
+
+  // Hardcoded userId (replace with dynamic value if needed)
+  userId: number = 3; // Replace with the actual userId
+
+  constructor(private orderService: OrderService) {}
+
+  ngOnInit(): void {
+    this.fetchOrders();
+  }
+
+  fetchOrders(): void {
+    this.orderService.getOrders(this.userId).subscribe({
+      next: (orders: Order[]) => {
+        this.orders = orders;
+        console.log('Fetched Orders:', this.orders);
+        this.applyFilter();
+      },
+      error: (error) => {
+        console.error('Error fetching orders:', error);
+      },
+    });
+  }
+
+  // Rest of the methods remain the same...
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import { Component, Input } from '@angular/core';
 import { OrderItem } from '../../models/order';
 @Component({
