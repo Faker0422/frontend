@@ -1,32 +1,160 @@
-  Error occurs in the template of component OrderStatusComponent.       
 
-    src/app/components/order-status/order-status.component.ts:6:15:     
-      6 │   templateUrl: './order-status.component.html',
-        ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+X [ERROR] NG9: Property 'order' does not exist on type 'OrderDetailsComponent'. [plugin angular-compiler]
 
+    src/app/components/order-details/order-details.component.html:17:31:
+      17 │       <div *ngFor="let item of order.orderItems">
+         ╵      ~~~~~
 
-X [ERROR] NG9: Property 'orderStatus' does not exist on type 'OrderStatusComponent'. [plugin angular-compiler]
+  Error occurs in the template of component OrderDetailsComponent.
 
-    src/app/components/order-status/order-status.component.html:11:96:  
-      11 │ ...tatus === 'delivered', 'cancelled': orderStatus === 'cancelled'}">
-         ╵                          
-              ~~~~~~~~~~~
-
-  Error occurs in the template of component OrderStatusComponent.       
-
-    src/app/components/order-status/order-status.component.ts:6:15:     
-      6 │   templateUrl: './order-status.component.html',
-        ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    src/app/components/order-details/order-details.component.ts:9:15:
+      9 │   templateUrl: './order-details.component.html', 
+        ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
 
 
-Watch mode enabled. Watching for file changes...
+X [ERROR] NG9: Property 'order' does not exist on type 'OrderDetailsComponent'. [plugin angular-compiler]
+
+    src/app/components/order-details/order-details.component.html:26:39:
+      26 │ ...-order-status [orderStatus]="order.orderStatus"></app-order-sta...
+         ╵       ~~~~~
+
+  Error occurs in the template of component OrderDetailsComponent.
+
+    src/app/components/order-details/order-details.component.ts:9:15:
+      9 │   templateUrl: './order-details.component.html', 
+        ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
 
 
+X [ERROR] TS2500: A class can only implement an identifier/qualified-name with optional type arguments. [plugin angular-compiler]
+
+    src/app/components/order-details/order-details.component.ts:12:46:
+      12 │ export class OrderDetailsComponent implements { 
+         ╵                     ^ 
 
 
+X [ERROR] TS1005: ',' expected. [plugin angular-compiler]  
+
+    src/app/components/order-details/order-details.component.ts:13:15:
+      13 │   order!: Order;
+         ╵                ^
 
 
+X [ERROR] TS1005: ',' expected. [plugin angular-compiler]  
 
+    src/app/components/order-details/order-details.component.ts:19:2:
+      19 │   ngOnInit(): void {
+         ╵   ~~~~~~~~
+
+
+X [ERROR] TS1005: '{' expected. [plugin angular-compiler]  
+
+    src/app/components/order-details/order-details.component.ts:29:0:
+      29 │
+         ╵ ^
+
+
+Application bundle generation failed. [0.137 seconds]      
+
+X [ERROR] NG9: Property 'highlightShippingFee' does not exist on type 'OrderItem'. [plugin angular-compiler]
+
+    src/app/components/order-details/order-details.component.html:22:51:
+      22 │ ...strong>Shipping Fee:</strong> ${{ item.highlightShippingFee }}</p>
+         ╵                                           ~~~~~~~~~~~~~~~~~~~~
+
+  Error occurs in the template of component OrderDetailsComponent.
+
+    src/app/components/order-details/order-details.component.ts:9:15:
+      9 │   templateUrl: './order-details.component.html', 
+        ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+
+
+X [ERROR] TS2304: Cannot find name 'On'. [plugin angular-compiler]
+
+    src/app/components/order-details/order-details.component.ts:12:46:
+      12 │ export class OrderDetailsComponent implements On {
+         ╵                     ~~
+
+
+Application bundle generation failed. [0.110 seconds]      
+
+X [ERROR] NG9: Property 'highlightShippingFee' does not exist on type 'OrderItem'. [plugin angular-compiler]
+
+    src/app/components/order-details/order-details.component.html:22:51:
+      22 │ ...strong>Shipping Fee:</strong> ${{ item.highlightShippingFee }}</p>
+         ╵                                           ~~~~~~~~~~~~~~~~~~~~
+
+  Error occurs in the template of component OrderDetailsComponent.
+
+    src/app/components/order-details/order-details.component.ts:9:15:
+      9 │   templateUrl: './order-details.component.html', 
+        ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+
+
+X [ERROR] TS2305: Module '"@angular/core"' has no exported member 'On'. [plugin angular-compiler]
+
+    src/app/components/order-details/order-details.component.ts:1:20:
+      1 │ import { Component, On } from '@angular/core';   
+        ╵                     ~~
+
+
+Application bundle generation failed. [0.146 seconds]      
+
+X [ERROR] NG9: Property 'highlightShippingFee' does not exist on type 'OrderItem'. [plugin angular-compiler]
+
+    src/app/components/order-details/order-details.component.html:22:51:
+      22 │ ...strong>Shipping Fee:</strong> ${{ item.highlightShippingFee }}</p>
+         ╵                                           ~~~~~~~~~~~~~~~~~~~~
+
+  Error occurs in the template of component OrderDetailsComponent.
+
+    src/app/components/order-details/order-details.component.ts:9:15:
+      9 │   templateUrl: './order-details.component.html', 
+        ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+
+
+X [ERROR] TS2304: Cannot find name 'On'. [plugin angular-compiler]
+
+    src/app/components/order-details/order-details.component.ts:12:46:
+      12 │ export class OrderDetailsComponent implements On {
+         ╵                     ~~
+
+
+Application bundle generation failed. [0.166 seconds]      
+
+X [ERROR] NG9: Property 'highlightShippingFee' does not exist on type 'OrderItem'. [plugin angular-compiler]
+
+    src/app/components/order-details/order-details.component.html:22:51:
+      22 │ ...strong>Shipping Fee:</strong> ${{ item.highlightShippingFee }}</p>
+         ╵                                           ~~~~~~~~~~~~~~~~~~~~
+
+  Error occurs in the template of component OrderDetailsComponent.
+
+    src/app/components/order-details/order-details.component.ts:9:15:
+      9 │   templateUrl: './order-details.component.html', 
+        ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  
+
+
+X [ERROR] TS2304: Cannot find name 'OnI'. [plugin angular-compiler]
+
+    src/app/components/order-details/order-details.component.ts:12:46:
+      12 │ export class OrderDetailsComponent implements OnI {
+         ╵                                               ~~~
+
+
+Application bundle generation failed. [0.126 seconds]      
+
+X [ERROR] NG9: Property 'highlightShippingFee' does not exist on type 'OrderItem'. [plugin angular-compiler]
+
+    src/app/components/order-details/order-details.component.html:22:51:
+      22 │ ...strong>Shipping Fee:</strong> ${{ item.highlightShippingFee }}</p>
+         ╵                                           ~~~~~~~~~~~~~~~~~~~~
+mponent OrderDetailsComponent.
+
+mponent OrderDetailsComponent.      
+
+    src/app/components/order-details/order-details.component.ts:9:15:   
+      9 │   templateUrl: './order-details.component.html',
+        ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 
