@@ -1,3 +1,27 @@
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { OrderDetailsComponent } from './components/order-details/order-details.component';
+
+const routes: Routes = [
+  { path: 'order-details/:orderItemId', component: OrderDetailsComponent },
+  { path: '', redirectTo: '/order-details/1', pathMatch: 'full' } // Default route (for testing)
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+
+
+
+
+
+
+
+
+
+
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { OrderDetailsService } from '../../services/order-details.service';
