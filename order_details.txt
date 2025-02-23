@@ -24,6 +24,52 @@ output sample:
     "createdAt": "2025-02-21T05:05:35.000+00:00"
 }
 
+@Override
+    public OrderItemDetailResponseDTO getOrderItemWithDetails(Integer orderItemId) {
+        OrderItem orderItem = orderItemRepository.findByOrderItemId(orderItemId)
+                .orElseThrow(() -> new OrderItemNotFoundException("Order Item not found with ID: " + orderItemId));
+        Order order = orderItem.getOrder(); // Get the associated Order
+
+        if (order == null) {
+            return null;
+        }
+
+        OrderItemDetailResponseDTO responseDTO = new OrderItemDetailResponseDTO();
+//        responseDTO.setOrderItem(convertToOrderItemDTO(orderItem));
+
+        OrderDTO orderDTO = convertToDTO(order);
+        responseDTO.setOrderId(orderDTO.getOrderId());
+        responseDTO.setDeliveryAddress(orderDTO.getDeliveryAddress());
+        responseDTO.setDeliveryDate(orderDTO.getDeliveryDate());
+        responseDTO.setOrderStatus(order.getOrderStatus()); // Set orderStatus from Order
+
+        OrderItemDTO orderItemDTO = convertToOrderItemDTO(orderItem);
+        responseDTO.setOrderItemId(orderItemDTO.getOrderItemId());
+        responseDTO.setProductId(orderItemDTO.getProductId());
+        responseDTO.setQuantity(orderItemDTO.getQuantity());
+        responseDTO.setTotalPrice(orderItemDTO.getTotalPrice());
+        responseDTO.setTotalPrice(orderItemDTO.getTotalPrice());
+        responseDTO.setCreatedAt(orderItemDTO.getCreatedAt());
+
+        // Fetch product details from Product Service to get productName, discount, image, shipping fee
+        ResponseEntity<ProductDTO> productResponse = productClient.getProductById(orderItem.getProductId());
+        if (productResponse.hasBody()) {
+            ProductDTO product = productResponse.getBody();
+            responseDTO.setProductName(product.getName());
+            responseDTO.setDiscount(product.getDiscount());
+            responseDTO.setImage(product.getImage1());
+            responseDTO.setPrice(product.getNewPrice());
+            responseDTO.setHighlightShippingFee(product.getHighlightShippingFee());
+        } else {
+            responseDTO.setProductName("Unknown Product");
+            responseDTO.setDiscount(0.0);
+            responseDTO.setImage(null);
+            responseDTO.setHighlightShippingFee(0.0);
+        }
+
+        return responseDTO;
+    }
+
 package com.genckart.dto;
 
 import lombok.AllArgsConstructor;
