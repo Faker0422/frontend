@@ -1,3 +1,29 @@
+get request: http://localhost:8766/api/order/item-detail/19
+output sample:
+{
+    "orderId": 17,
+    "orderItemId": 19,
+    "productId": 9,
+    "productName": "Product9",
+    "price": 50.0,
+    "quantity": 2,
+    "discount": 50.0,
+    "totalPrice": 100.0,
+    "image": "image1i.jpg",
+    "deliveryAddress": {
+        "addressId": 15,
+        "street": "1212 Hemlock St",
+        "city": "Karur",
+        "state": "TN",
+        "postalCode": "600015",
+        "country": "India"
+    },
+    "deliveryDate": "2025-03-08",
+    "orderStatus": "DELIVERED",
+    "highlightShippingFee": 13.0,
+    "createdAt": "2025-02-21T05:05:35.000+00:00"
+}
+
 package com.genckart.dto;
 
 import lombok.AllArgsConstructor;
