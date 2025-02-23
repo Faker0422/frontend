@@ -19,7 +19,8 @@
 
 
 
-
+NG1: Property 'order' does not exist on type 'OrderDetailsComponent'. Did you mean 'order$'?
+src/app/components/order-details/order-details.component.html:3:32
 
 
 
