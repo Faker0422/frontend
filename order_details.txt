@@ -1,3 +1,9 @@
+
+order-details.component.ts:27  Order Item ID is missing from the URL.
+
+
+
+
 PS C:\JAVA\order-details\src\app\models> ng serve
 Node.js version v23.1.0 detected.
 Odd numbered Node.js versions will not enter LTS status and should not be used for production. For more information, please see https://nodejs.org/en/about/previous-releases/.
