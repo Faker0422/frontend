@@ -1,3 +1,118 @@
+// order-status-bar.component.ts
+import { Component, Input } from '@angular/core';
+
+@Component({
+  selector: 'app-order-status-bar',
+  templateUrl: './order-status-bar.component.html',
+  styleUrls: ['./order-status-bar.component.css']
+})
+export class OrderStatusBarComponent {
+  @Input() status: string = '';
+}
+
+// order-status-bar.component.html
+<div class="status-bar">
+  <div class="step completed">Ordered<br><span>Oct 24</span></div>
+  <div class="step completed">Shipped<br><span>Oct 30</span></div>
+  <div class="step completed">Delivered<br><span>Nov 01</span></div>
+</div>
+
+// order-status-bar.component.css
+.status-bar {
+  display: flex;
+  justify-content: space-between;
+  background: #f5f5f5;
+  padding: 10px;
+  border-radius: 5px;
+}
+.step {
+  text-align: center;
+}
+.completed {
+  color: blue;
+}
+
+// order-summary.component.ts
+import { Component, Input } from '@angular/core';
+
+@Component({
+  selector: 'app-order-summary',
+  templateUrl: './order-summary.component.html',
+  styleUrls: ['./order-summary.component.css']
+})
+export class OrderSummaryComponent {
+  @Input() order: any;
+}
+
+// order-summary.component.html
+<div class="order-summary">
+  <div><strong>Ordered:</strong> {{ order.date }}</div>
+  <div><strong>Order number:</strong> {{ order.orderNumber }}</div>
+  <div><strong>Ordered from:</strong> {{ order.seller }}</div>
+  <div><strong>Shipping address:</strong> {{ order.shippingAddress }}</div>
+  <div><strong>Payment method:</strong> {{ order.paymentMethod }}</div>
+  <div><strong>Shipping:</strong> {{ order.shipping }}</div>
+  <div><strong>Discount:</strong> {{ order.discount }}</div>
+  <div><strong>Total:</strong> {{ order.total }}</div>
+</div>
+
+// order-details.component.ts
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-order-details',
+  templateUrl: './order-details.component.html',
+  styleUrls: ['./order-details.component.css']
+})
+export class OrderDetailsComponent {
+  order = {
+    date: 'Oct 24, 2019',
+    orderNumber: 'SMLS-6500-5000-0050',
+    seller: 'Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA',
+    shippingAddress: 'Smiles Davis, 600 Montgomery St, CA 94111',
+    paymentMethod: 'Visa **** 6500',
+    shipping: '$0.00',
+    discount: '- $49.00',
+    total: '$0.00',
+  };
+}
+
+// order-details.component.html
+<div class="order-details">
+  <p>Your shipment was just dropped off. Go on. Open it and enjoy.</p>
+  <app-order-status-bar [status]="'delivered'"></app-order-status-bar>
+  <app-order-summary [order]="order"></app-order-summary>
+</div>
+
+// order-details.component.css
+.order-details {
+  padding: 20px;
+  background: white;
+  border-radius: 5px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import { Component, OnInit } from '@angular/core';
 import { OrderService } from '../../services/order.service';
 import { OrderItemDetailResponseDTO } from '../../models/order-item-detail-response-dto';
