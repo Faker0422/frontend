@@ -1,3 +1,105 @@
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { OrderDetailsService } from '../../services/order-details.service';
+import { OrderItemDetailResponseDTO } from '../../models/order-item-detail-response.dto';
+import { Observable } from 'rxjs';
+
+@Component({
+  selector: 'app-order-details',
+  templateUrl: './order-details.component.html',
+  styleUrls: ['./order-details.component.css']
+})
+export class OrderDetailsComponent implements OnInit {
+  order$!: Observable<OrderItemDetailResponseDTO>;
+
+  constructor(
+    private orderDetailsService: OrderDetailsService,
+    private route: ActivatedRoute
+  ) {}
+
+  ngOnInit() {
+    const orderItemId = Number(this.route.snapshot.paramMap.get('orderItemId'));
+    if (orderItemId) {
+      this.order$ = this.orderDetailsService.getOrderDetails(orderItemId);
+    }
+  }
+}
+
+<div class="order-details" *ngIf="order$ | async as order; else loading">
+  <h2>Order Details</h2>
+  <p>Your shipment was just dropped off. Go on. Open it and enjoy.</p>
+
+  <div class="order-summary">
+    <div><strong>Order ID:</strong> {{ order.orderId }}</div>
+    <div><strong>Order Item ID:</strong> {{ order.orderItemId }}</div>
+    <div><strong>Product ID:</strong> {{ order.productId }}</div>
+    <div><strong>Product Name:</strong> {{ order.productName }}</div>
+    <div><strong>Quantity:</strong> {{ order.quantity }}</div>
+    <div><strong>Product Price:</strong> {{ order.productPrice }}</div>
+    <div><strong>Discount:</strong> {{ order.discount }}</div>
+    <div><strong>Total Price:</strong> {{ order.totalPrice }}</div>
+    <div><strong>Image:</strong> <img [src]="order.image" alt="Product Image"></div>
+    <div><strong>Delivery Address:</strong>
+      {{ order.deliveryAddress.street }}, {{ order.deliveryAddress.city }}, 
+      {{ order.deliveryAddress.state }} - {{ order.deliveryAddress.postalCode }},
+      {{ order.deliveryAddress.country }}
+    </div>
+    <div><strong>Delivery Date:</strong> {{ order.deliveryDate }}</div>
+    <div><strong>Order Status:</strong> {{ order.orderStatus }}</div>
+    <div><strong>Shipping Fee:</strong> {{ order.highlightShippingFee }}</div>
+    <div><strong>Created At:</strong> {{ order.createdAt }}</div>
+  </div>
+</div>
+
+<ng-template #loading>
+  <p>Loading order details...</p>
+</ng-template>
+
+
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { OrderItemDetailResponseDTO } from '../models/order-item-detail-response.dto';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class OrderDetailsService {
+  private apiUrl = 'http://localhost:8080/api/order/order-details'; // Adjust as needed
+
+  constructor(private http: HttpClient) {}
+
+  getOrderDetails(orderItemId: number): Observable<OrderItemDetailResponseDTO> {
+    return this.http.get<OrderItemDetailResponseDTO>(`${this.apiUrl}/${orderItemId}`);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { OrderDetailsComponent } from './components/order-details/order-details.component';
