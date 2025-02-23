@@ -1,3 +1,150 @@
+
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { OrderItemDetailResponseDTO } from '../models/order-item-detail-response-dto';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class OrderService {
+  private apiUrl = 'http://localhost:8766/api/order';
+
+  constructor(private http: HttpClient) { }
+
+  getOrderItemDetails(orderItemId: number): Observable<OrderItemDetailResponseDTO> {
+    return this.http.get<OrderItemDetailResponseDTO>(`${this.apiUrl}/item-detail/${orderItemId}`);
+  }
+}
+
+
+
+
+<div *ngIf="orderDetails" class="container mt-5">
+  <div class="card">
+    <div class="card-header bg-primary text-white">
+      <h2 class="card-title">Order Details</h2>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <!-- Product Image -->
+        <div class="col-md-4">
+          <img [src]="orderDetails.image" alt="Product Image" class="img-fluid rounded" />
+        </div>
+        <!-- Order Details -->
+        <div class="col-md-8">
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <p><strong>Order ID:</strong> {{ orderDetails.orderId }}</p>
+              <p><strong>Product Name:</strong> {{ orderDetails.productName }}</p>
+              <p><strong>Price:</strong> {{ orderDetails.price | currency }}</p>
+              <p><strong>Quantity:</strong> {{ orderDetails.quantity }}</p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>Discount:</strong> {{ orderDetails.discount | currency }}</p>
+              <p><strong>Total Price:</strong> {{ orderDetails.totalPrice | currency }}</p>
+              <p><strong>Shipping Fee:</strong> {{ orderDetails.highlightShippingFee | currency }}</p>
+              <p><strong>Order Status:</strong> <span class="badge bg-success">{{ orderDetails.orderStatus }}</span></p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <p><strong>Delivery Address:</strong></p>
+              <p>{{ orderDetails.deliveryAddress.street }}, {{ orderDetails.deliveryAddress.city }}, {{ orderDetails.deliveryAddress.state }}, {{ orderDetails.deliveryAddress.postalCode }}, {{ orderDetails.deliveryAddress.country }}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <p><strong>Delivery Date:</strong> {{ orderDetails.deliveryDate | date }}</p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>Order Created At:</strong> {{ orderDetails.createdAt | date:'medium' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="!orderDetails" class="container mt-5">
+  <div class="text-center">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading order details...</p>
+  </div>
+</div>
+
+
+
+/* Custom styles for the order details page */
+.card {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.img-fluid {
+  max-height: 300px;
+  object-fit: cover;
+}
+
+.badge {
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+}
+
+
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { OrderService } from '../../services/order.service';
+import { OrderItemDetailResponseDTO } from '../../models/order-item-detail-response-dto';
+
+@Component({
+  selector: 'app-order-details',
+  templateUrl: './order-details.component.html',
+  styleUrls: ['./order-details.component.css']
+})
+export class OrderDetailsComponent implements OnInit {
+  orderItemId: number;
+  orderDetails: OrderItemDetailResponseDTO;
+
+  constructor(private route: ActivatedRoute, private orderService: OrderService) { }
+
+  ngOnInit(): void {
+    this.orderItemId = +this.route.snapshot.paramMap.get('orderItemId');
+    this.orderService.getOrderItemDetails(this.orderItemId).subscribe(data => {
+      this.orderDetails = data;
+      // Ensure the image URL is correct (if stored as a relative path, prepend the base URL)
+      if (this.orderDetails.image && !this.orderDetails.image.startsWith('http')) {
+        this.orderDetails.image = `http://your-backend-base-url/${this.orderDetails.image}`;
+      }
+    });
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 get request: http://localhost:8766/api/order/item-detail/19
 output sample:
 {
