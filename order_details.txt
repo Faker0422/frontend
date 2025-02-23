@@ -1,3 +1,62 @@
+PS C:\JAVA\order-details\src\app\models> ng serve
+Node.js version v23.1.0 detected.
+Odd numbered Node.js versions will not enter LTS status and should not be used for production. For more information, please see https://nodejs.org/en/about/previous-releases/.
+Component HMR has been enabled.
+If you encounter application reload issues, you can manually reload the page to bypass HMR and/or disable this feature with the `--no-hmr` command line option.
+Please consider reporting any issues you encounter here: https://github.com/angular/angular-cli/issues  
+
+Application bundle generation failed. [3.084 seconds]
+
+X [ERROR] NG9: Property 'orderId' does not exist on type 'OrderItemDetailResponseDTO'. [plugin angular-compiler]
+
+    src/app/components/order-details/order-details.component.html:16:62:
+      16 │ ...      <p><strong>Order ID:</strong> {{ orderDetails.orderId }}</p>
+         ╵                                          
+              ~~~~~~~
+
+  Error occurs in the template of component OrderDetailsComponent.
+
+    src/app/components/order-details/order-details.component.ts:9:15:
+      9 │   templateUrl: './order-details.component.html',
+        ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Watch mode enabled. Watching for file changes...
+Application bundle generation failed. [0.433 seconds]
+
+X [ERROR] NG9: Property 'orderId' does not exist on type 'OrderItemDetailResponseDTO'. [plugin angular-compiler]
+
+    src/app/components/order-details/order-details.component.html:16:62:
+      16 │ ...      <p><strong>Order ID:</strong> {{ orderDetails.orderId }}</p>
+         ╵                                          
+              ~~~~~~~
+
+  Error occurs in the template of component OrderDetailsComponent.
+
+    src/app/components/order-details/order-details.component.ts:9:15:
+      9 │   templateUrl: './order-details.component.html',
+        ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { OrderService } from '../../services/order.service';
