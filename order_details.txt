@@ -1,3 +1,27 @@
+
+X [ERROR] NG1: Property 'orderItemDetailResponse' does not exist on type 'OrderDetailsComponent'. Did you mean 'orderItemDetailResponse$'? [plugin angular-compiler]
+
+    src/app/components/order-details/order-details.component.html:97:86:
+      97 │ ...ss="float-end">${{ (orderItemDetailResponse.totalPrice) }}</spa...
+         ╵                        ~~~~~~~~~~~~~~~~~~~~~~~
+
+  Error occurs in the template of component OrderDetailsComponent.
+
+    src/app/components/order-details/order-details.component.ts:9:15:
+      9 │   templateUrl: './order-details.component.html',
+        ╵                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
+
+
+
+
+
+
+
 Argument of type 'number' is not assignable to parameter of type 'string'.ts(2345)
 (parameter) orderItemId: number
     this.orderItemDetailResponse$ = this.orderService.getOrderItemDetails(orderItemId);
