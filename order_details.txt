@@ -1,3 +1,64 @@
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { OrderService } from '../../services/order.service';
+import { OrderItemDetailResponseDTO } from '../../models/order-item-detail-response-dto';
+
+@Component({
+  selector: 'app-order-details',
+  templateUrl: './order-details.component.html',
+  styleUrls: ['./order-details.component.css']
+})
+export class OrderDetailsComponent implements OnInit {
+  orderItemId!: number; // Definite assignment assertion
+  orderDetails!: OrderItemDetailResponseDTO; // Definite assignment assertion
+
+  constructor(private route: ActivatedRoute, private orderService: OrderService) { }
+
+  ngOnInit(): void {
+    // Safely get the orderItemId from the route
+    const orderItemIdParam = this.route.snapshot.paramMap.get('orderItemId');
+    
+    // Check if orderItemIdParam is not null
+    if (orderItemIdParam !== null) {
+      this.orderItemId = +orderItemIdParam; // Convert to number
+      this.fetchOrderDetails(this.orderItemId);
+    } else {
+      console.error('Order Item ID is missing from the URL.');
+      // Handle the case where orderItemId is missing (e.g., redirect or show an error message)
+    }
+  }
+
+  private fetchOrderDetails(orderItemId: number): void {
+    this.orderService.getOrderItemDetails(orderItemId).subscribe({
+      next: (data) => {
+        this.orderDetails = data;
+        // Ensure the image URL is correct (if stored as a relative path, prepend the base URL)
+        if (this.orderDetails.image && !this.orderDetails.image.startsWith('http')) {
+          this.orderDetails.image = `http://your-backend-base-url/${this.orderDetails.image}`;
+        }
+      },
+      error: (err) => {
+        console.error('Failed to fetch order details:', err);
+        // Handle the error (e.g., show a user-friendly message)
+      }
+    });
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Property 'orderItemId' has no initializer and is not definitely assigned in the constructor.ts(2564)
 (property) OrderDetailsComponent.orderItemId: number
 
