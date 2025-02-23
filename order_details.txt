@@ -1,3 +1,24 @@
+<div class="order-summary">
+    <div><strong>Order ID:</strong> {{ order.orderId }}</div>
+    <div><strong>Order Item ID:</strong> {{ order.orderItemId }}</div>
+    <div><strong>Product ID:</strong> {{ order.productId }}</div>
+    <div><strong>Product Name:</strong> {{ order.productName }}</div>
+    <div><strong>Price:</strong> {{ order.price }}</div>
+    <div><strong>Quantity:</strong> {{ order.quantity }}</div>
+    <div><strong>Discount:</strong> {{ order.discount }}</div>
+    <div><strong>Total Price:</strong> {{ order.totalPrice }}</div>
+    <div><strong>Image:</strong> <img src="{{ order.image }}" alt="Product Image"></div>
+    <div><strong>Delivery Address:</strong> {{ order.deliveryAddress }}</div>
+    <div><strong>Delivery Date:</strong> {{ order.deliveryDate }}</div>
+    <div><strong>Order Status:</strong> {{ order.orderStatus }}</div>
+    <div><strong>Shipping Fee:</strong> {{ order.highlightShippingFee }}</div>
+</div>
+
+
+
+
+
+
 import { Component } from '@angular/core';
 
 @Component({
