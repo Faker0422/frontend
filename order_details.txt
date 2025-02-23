@@ -1,3 +1,17 @@
+<div class="order-details">
+    <p>Your shipment was just dropped off. Go on. Open it and enjoy.</p>
+    <app-order-summary [order]="order"></app-order-summary>
+  </div>
+  
+ 
+
+
+
+
+
+
+
+
 import { Component, OnInit } from '@angular/core';
 import { OrderDetailsService } from '../services/order-details.service';
 import { OrderItemDetailResponseDTO } from '../models/order-item-detail-response.dto';
