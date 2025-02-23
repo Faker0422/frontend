@@ -1,3 +1,128 @@
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-order-details',
+  standalone: false,
+  templateUrl: './order-details.component.html',
+  styleUrls: ['./order-details.component.css']
+})
+export class OrderDetailsComponent {
+  
+  order = {
+    date: 'Oct 24, 2019',
+    orderNumber: '1',
+    orderItemId: '1',
+    productId:'1',
+    productName: 'Product 1',
+    totalPrice: '50',
+    quantity: '2',
+    image: 'image1.jpg',
+    deliveryDate: '2025-02-20',
+    orderStatus: 'DELIVERED',
+    shippingAddress: 'Smiles Davis, 600 Montgomery St, CA 94111',
+    highlightShippingFee: '$0.00',
+    discount: '- $49.00',
+    total: '100',
+  };
+}
+above is static data but i want to replace this with the data from my db and below is my dto and backend code
+package com.genckart.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.sql.Timestamp;
+import java.time.LocalDate;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class OrderItemDetailResponseDTO {
+//    private OrderItemDTO orderItem;
+    private Integer orderId;
+    private Integer orderItemId;
+    private Integer productId;
+    private String productName;
+    private Double price;
+    private Integer quantity;
+    private Double discount;
+    private Double totalPrice;
+    private String image;
+    private AddressDTO deliveryAddress;
+    private LocalDate deliveryDate;
+    private String orderStatus;
+    private double highlightShippingFee;
+    private Timestamp createdAt;
+}
+
+service layer code:
+
+@Override
+    public OrderItemDetailResponseDTO getOrderItemWithDetails(Integer orderItemId) {
+        OrderItem orderItem = orderItemRepository.findByOrderItemId(orderItemId)
+                .orElseThrow(() -> new OrderItemNotFoundException("Order Item not found with ID: " + orderItemId));
+        Order order = orderItem.getOrder(); // Get the associated Order
+
+        if (order == null) {
+            return null;
+        }
+
+        OrderItemDetailResponseDTO responseDTO = new OrderItemDetailResponseDTO();
+//        responseDTO.setOrderItem(convertToOrderItemDTO(orderItem));
+
+        OrderDTO orderDTO = convertToDTO(order);
+        responseDTO.setOrderId(orderDTO.getOrderId());
+        responseDTO.setDeliveryAddress(orderDTO.getDeliveryAddress());
+        responseDTO.setDeliveryDate(orderDTO.getDeliveryDate());
+        responseDTO.setOrderStatus(order.getOrderStatus()); // Set orderStatus from Order
+
+        OrderItemDTO orderItemDTO = convertToOrderItemDTO(orderItem);
+        responseDTO.setOrderItemId(orderItemDTO.getOrderItemId());
+        responseDTO.setProductId(orderItemDTO.getProductId());
+        responseDTO.setQuantity(orderItemDTO.getQuantity());
+        responseDTO.setTotalPrice(orderItemDTO.getTotalPrice());
+        responseDTO.setTotalPrice(orderItemDTO.getTotalPrice());
+        responseDTO.setCreatedAt(orderItemDTO.getCreatedAt());
+
+        // Fetch product details from Product Service to get productName, discount, image, shipping fee
+        ResponseEntity<ProductDTO> productResponse = productClient.getProductById(orderItem.getProductId());
+        if (productResponse.hasBody()) {
+            ProductDTO product = productResponse.getBody();
+            responseDTO.setProductName(product.getName());
+            responseDTO.setDiscount(product.getDiscount());
+            responseDTO.setImage(product.getImage1());
+            responseDTO.setPrice(product.getNewPrice());
+            responseDTO.setHighlightShippingFee(product.getHighlightShippingFee());
+        } else {
+            responseDTO.setProductName("Unknown Product");
+            responseDTO.setDiscount(0.0);
+            responseDTO.setImage(null);
+            responseDTO.setHighlightShippingFee(0.0);
+        }
+
+        return responseDTO;
+    }
+
+controller layer code:
+
+@RequestMapping("/api/order")
+
+@GetMapping("/order-details/{orderItemId}") // Endpoint to fetch a single order item with delivery details
+    public ResponseEntity<OrderItemDetailResponseDTO> getOrderItemWithDetails(@PathVariable Integer orderItemId) {
+        OrderItemDetailResponseDTO orderItemDetailResponseDTO = orderService.getOrderItemWithDetails(orderItemId); // Use the new service method
+        if (orderItemDetailResponseDTO != null) {
+            return new ResponseEntity<>(orderItemDetailResponseDTO, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Or handle not found case as needed
+        }
+    }
+
+
+
+
+
+
 // order-status-bar.component.ts
 import { Component, Input } from '@angular/core';
 
