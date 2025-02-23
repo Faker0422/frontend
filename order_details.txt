@@ -1,3 +1,16 @@
+Property 'orderItemId' has no initializer and is not definitely assigned in the constructor.ts(2564)
+(property) OrderDetailsComponent.orderItemId: number
+
+
+Property 'orderDetails' has no initializer and is not definitely assigned in the constructor.ts(2564)
+(property) OrderDetailsComponent.orderDetails: OrderItemDetailResponseDTO
+
+
+
+
+
+
+
 
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
