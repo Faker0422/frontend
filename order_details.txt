@@ -1,3 +1,118 @@
+import { Component, OnInit } from '@angular/core';
+import { OrderDetailsService } from '../services/order-details.service';
+import { OrderItemDetailResponseDTO } from '../models/order-item-detail-response.dto';
+
+@Component({
+  selector: 'app-order-details',
+  templateUrl: './order-details.component.html',
+  styleUrls: ['./order-details.component.css']
+})
+export class OrderDetailsComponent implements OnInit {
+  order!: OrderItemDetailResponseDTO;
+
+  constructor(private orderDetailsService: OrderDetailsService) {}
+
+  ngOnInit() {
+    this.fetchOrderDetails(1); // Fetch order details for orderItemId 1 (Change as needed)
+  }
+
+  fetchOrderDetails(orderItemId: number) {
+    this.orderDetailsService.getOrderDetails(orderItemId)
+      .subscribe(
+        data => {
+          this.order = data;
+        },
+        error => {
+          console.error('Error fetching order details:', error);
+        }
+      );
+  }
+}
+
+// services/order-details.service.ts
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { OrderItemDetailResponseDTO } from '../models/order-item-detail-response.dto';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class OrderDetailsService {
+  private apiUrl = 'http://localhost:8080/api/order/order-details';
+
+  constructor(private http: HttpClient) {}
+
+  getOrderDetails(orderItemId: number): Observable<OrderItemDetailResponseDTO> {
+    return this.http.get<OrderItemDetailResponseDTO>(`${this.apiUrl}/${orderItemId}`);
+  }
+}
+
+// models/order-item-detail-response.dto.ts
+export interface OrderItemDetailResponseDTO {
+  orderId: number;
+  orderItemId: number;
+  productId: number;
+  productName: string;
+  price: number;
+  quantity: number;
+  discount: number;
+  totalPrice: number;
+  image: string;
+  deliveryAddress: {
+    street: string;
+    city: string;
+    state: string;
+    zip: string;
+  };
+  deliveryDate: string;
+  orderStatus: string;
+  highlightShippingFee: number;
+}
+
+// order-details.component.html
+<div class="order-details" *ngIf="order">
+  <p>Your shipment was just dropped off. Go on. Open it and enjoy.</p>
+  <div class="order-summary">
+    <div><strong>Order ID:</strong> {{ order.orderId }}</div>
+    <div><strong>Order Item ID:</strong> {{ order.orderItemId }}</div>
+    <div><strong>Product ID:</strong> {{ order.productId }}</div>
+    <div><strong>Product Name:</strong> {{ order.productName }}</div>
+    <div><strong>Price:</strong> {{ order.price }}</div>
+    <div><strong>Quantity:</strong> {{ order.quantity }}</div>
+    <div><strong>Discount:</strong> {{ order.discount }}</div>
+    <div><strong>Total Price:</strong> {{ order.totalPrice }}</div>
+    <div><strong>Image:</strong> <img src="{{ order.image }}" alt="Product Image"></div>
+    <div><strong>Delivery Address:</strong> {{ order.deliveryAddress.street }}, {{ order.deliveryAddress.city }}, {{ order.deliveryAddress.state }} {{ order.deliveryAddress.zip }}</div>
+    <div><strong>Delivery Date:</strong> {{ order.deliveryDate }}</div>
+    <div><strong>Order Status:</strong> {{ order.orderStatus }}</div>
+    <div><strong>Shipping Fee:</strong> {{ order.highlightShippingFee }}</div>
+  </div>
+</div>
+
+// order-details.component.css
+.order-details {
+  padding: 20px;
+  background: white;
+  border-radius: 5px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <div class="order-summary">
     <div><strong>Order ID:</strong> {{ order.orderId }}</div>
     <div><strong>Order Item ID:</strong> {{ order.orderItemId }}</div>
