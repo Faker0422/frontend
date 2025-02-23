@@ -1,3 +1,230 @@
+import { Component, OnInit } from '@angular/core';
+import { OrderService } from '../../services/order.service';
+import { OrderItemDetailResponseDTO } from '../../models/order-item-detail-response-dto';
+import { OrderItem } from '../../models/order-item';
+import { ActivatedRoute } from '@angular/router';
+
+@Component({
+  selector: 'app-order-details',
+  standalone: false,
+  templateUrl: './order-details.component.html',
+  styleUrl: './order-details.component.css'
+})
+export class OrderDetailsComponent implements OnInit {
+
+  orderItemDetailResponse!: OrderItemDetailResponseDTO;
+  orderItem!: OrderItem;
+  orderItemId!: string | null;
+  orderNumber: string = 'SMLS.6500-5000-0050'; // Static order number - consider making dynamic
+
+  constructor(
+    private orderService: OrderService,
+    private route: ActivatedRoute
+  ) { }
+
+  ngOnInit(): void {
+    this.orderItemId = this.route.snapshot.paramMap.get('orderItemId');
+
+    if (this.orderItemId) {
+      this.loadOrderItemDetails(this.orderItemId);
+    } else {
+      console.error('Order Item ID is missing in the route.');
+    }
+  }
+
+  loadOrderItemDetails(orderItemId: string): void {
+    this.orderService.getOrderItemDetails(orderItemId).subscribe(
+      data => {
+        this.orderItemDetailResponse = data;
+        console.log('Order Item Detail Response:', this.orderItemDetailResponse);
+      },
+      error => {
+        console.error('Error fetching order item details:', error);
+      }
+    );
+  }
+
+   formatDate(dateString: string | number | undefined): string { // Modified formatDate
+    if (!dateString) return '';
+    let date: Date;
+    if (typeof dateString === 'number') {
+      date = new Date(dateString); // Treat number as timestamp
+    } else {
+      date = new Date(dateString); // Treat string as date string
+    }
+    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+    return date.toLocaleDateString(undefined, options);
+  }
+
+  formatTime(dateString: string | undefined): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const options: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
+    return date.toLocaleTimeString(undefined, options);
+  }
+}
+
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <p class="mb-1">Your shipment was just dropped off. Go on. Open it and enjoy.</p>
+
+                    <div class="d-flex justify-content-around mb-4 mt-3">
+                        <div>
+                            <div class="text-center">Ordered</div>
+                            <div class="text-center">{{ formatDate(orderItemDetailResponse?.createdAt) }}</div>
+                        </div>
+                        <div>
+                            <div class="text-center">Shipped</div>
+                            <div class="text-center">{{ formatDate(orderItemDetailResponse?.deliveryDate) }}</div>
+                        </div>
+                        <div>
+                            <div class="text-center">Delivered</div>
+                            <div class="text-center">{{ formatDate(orderItemDetailResponse?.deliveryDate) }}</div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-around align-items-center mb-4">
+                        <div class="text-center">
+                            <span class="badge rounded-pill bg-primary" *ngIf="orderItemDetailResponse?.orderStatus === 'Ordered'">&#10004;</span>
+                            <span class="badge rounded-pill bg-light border" *ngIf="orderItemDetailResponse?.orderStatus !== 'Ordered'">&#10004;</span>
+                        </div>
+                        <div class="text-center">
+                            <span class="badge rounded-pill bg-primary" *ngIf="orderItemDetailResponse?.orderStatus !== 'Ordered' && orderItemDetailResponse?.orderStatus !== 'Shipped'">&#10004;</span>
+                            <span class="badge rounded-pill bg-primary" *ngIf="orderItemDetailResponse?.orderStatus === 'Shipped'">&#10004;</span>
+                            <span class="badge rounded-pill bg-light border" *ngIf="orderItemDetailResponse?.orderStatus === 'Ordered'">&#10004;</span>
+                        </div>
+                        <div class="text-center">
+                            <span class="badge rounded-pill bg-primary">&#10004;</span>
+                        </div>
+                    </div>
+
+                    <hr class="mb-3">
+
+                    <div class="row mb-3">
+                        <div class="col-md-8 d-flex align-items-center">
+                            <img [src]="orderItemDetailResponse?.image" alt="{{ orderItemDetailResponse?.productName }}" style="max-height: 80px; margin-right: 15px;">
+                            <div>
+                                <h6 class="mb-0">{{ orderItemDetailResponse?.productName }}</h6>
+                                <small class="text-muted">ID number {{ orderItemDetailResponse?.productId }}</small>
+                                <small class="text-muted">{{ orderItemDetailResponse?.productId }}</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <h6 class="mb-0">${{ orderItemDetailResponse?.productPrice?.toFixed(2) }}</h6>
+                            <small class="text-muted">Quantity: {{ orderItemDetailResponse?.quantity }}</small>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <button class="btn btn-outline-primary btn-sm">Track Shipment</button>
+                    </div>
+
+                    <hr class="mb-3">
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="mb-1"><b>Ordered</b></p>
+                            <p class="mb-0">{{ formatDate(orderItemDetailResponse?.createdAt) }}, {{ formatTime(orderItemDetailResponse?.createdAt) }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1"><b>Order number</b></p>
+                            <p class="mb-0">{{ orderItemDetailResponse?.orderItemId }}</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="mb-1"><b>Ordered from</b></p>
+                            <div *ngIf="orderItemDetailResponse?.deliveryAddress">
+                              <p class="mb-0">{{ orderItemDetailResponse?.deliveryAddress?.country }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1"><b>Shipping address</b></p>
+                            <div *ngIf="orderItemDetailResponse?.deliveryAddress">
+                              <p class="mb-0">{{ orderItemDetailResponse.deliveryAddress.street }}</p>
+                              <p class="mb-0">{{ orderItemDetailResponse.deliveryAddress.city }}, {{ orderItemDetailResponse.deliveryAddress.state }} {{ orderItemDetailResponse.deliveryAddress.postalCode }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p class="mb-1"><b>Payment method</b></p>
+                            <p class="mb-0">Visa **** 6500</p>
+                         </div>
+                        <div class="col-md-6 text-md-end">
+                            <p class="mb-1"><b>Shipping</b> <span class="float-end">{{ orderItemDetailResponse?.highlightShippingFee | currency:'USD':'symbol':'1.2-2' }}</span></p>
+                            <p class="mb-1"><b>Discount</b> <span class="float-end">{{ orderItemDetailResponse?.discount | currency:'USD':'symbol':'1.2-2' }}</span></p>
+                            <p class="mb-1"><b>Tax</b> <span class="float-end">$0.00</span></p>
+                            <p class="mb-1"><b>Total</b> <span class="float-end">${{ (orderItemDetailResponse.totalPrice) }}</span></p>
+                        </div>
+                    </div>
+
+                    <hr>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+/* src/app/components/order-details/order-details.component.css */
+.badge.rounded-pill.bg-light.border {
+  background-color: #f8f9fa !important; /* To match light gray background */
+}
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { OrderItemDetailResponseDTO } from '../models/order-item-detail-response-dto';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class OrderService {
+
+  private apiUrl = 'http://localhost:8766/api/order/'; 
+
+  constructor(private http: HttpClient) { }
+
+  getOrderItemDetails(orderItemId: string): Observable<OrderItemDetailResponseDTO> {
+    return this.http.get<OrderItemDetailResponseDTO>(`${this.apiUrl}/order-details/1`);
+  }
+}
+order-details.component.ts:31 
+ Order Item ID is missing in the route.
+main.ts:4 
+ ERROR TypeError: Cannot read properties of undefined (reading 'totalPrice')
+    at OrderDetailsComponent_Template (order-details.component.html:97:82)
+Promise.then		
+(anonymous)	@	main.ts:4
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 order-details.component.ts:27  Order Item ID is missing from the URL.
 
